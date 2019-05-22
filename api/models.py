@@ -15,7 +15,10 @@ class Interview(models.Model):
     hours = models.IntegerField(default=1)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    interviewer = models.ForeignKey(Interviewer, on_delete=models.CASCADE)
+    interviewers = models.ManyToManyField(Interviewer)
+
+    def __str__(self):
+        return "{} <{}>".format(self.candidate_name, self.candidate_email)
 
 
 class TimeSlot(models.Model):

@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from .models import Interviewer
+from .models import Interview, Interviewer
 
 
 class InterviewerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interviewer
-        fields = ('id', 'name', 'email')
+        fields = '__all__'
+
+
+class InterviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interview
+        fields = '__all__'

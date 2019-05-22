@@ -1,16 +1,12 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from rest_framework.test import RequestsClient
-from .factories import InterviewerFactory
-from .views import InterviewerViewSet
-from .models import Interviewer
+from ..factories import InterviewerFactory
+from ..models import Interviewer
 import factory.random
 import json
 
 
 class InterviewerTestCase(TestCase):
-
-    viewset = InterviewerViewSet
 
     def setUp(self):
         factory.random.reseed_random('chemondis')
@@ -49,6 +45,12 @@ class InterviewerTestCase(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data.get('name'), ['This field may not be blank.'])
         self.assertEqual(data.get('email'), ['This field may not be blank.'])
+
+    def test_create__null(self):
+        response = self.client.post('/api/v1/interviewers/')
+        data = json.loads(response.content)
+        self.assertEqual(data.get('name'), ['This field is required.'])
+        self.assertEqual(data.get('email'), ['This field is required.'])
 
     def test_create__invalid_email(self):
         response = self.client.post(
