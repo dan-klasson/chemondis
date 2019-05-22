@@ -1,3 +1,20 @@
 from django.db import models
 
-# Create your models here.
+
+class Interviewer(models.Model):
+    name = models.CharField(max_length=254)
+    email = models.EmailField()
+
+
+class Interview(models.Model):
+    candidate_name = models.CharField(max_length=254)
+    candidate_email = models.EmailField()
+    hours = models.IntegerField(default=1)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    interviewer = models.ForeignKey(Interviewer, on_delete=models.CASCADE)
+
+
+class TimeSlot(models.Model):
+    interview_date = models.DateTimeField(db_index=True)
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
