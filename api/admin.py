@@ -1,3 +1,8 @@
 from django.contrib import admin
+from api.models import Interviewer
 
-# Register your models here.
+
+class InterviewerAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Interviewer, InterviewerAdmin)

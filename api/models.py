@@ -5,6 +5,9 @@ class Interviewer(models.Model):
     name = models.CharField(max_length=254)
     email = models.EmailField()
 
+    def __str__(self):
+        return "{} <{}>".format(self.name, self.email)
+
 
 class Interview(models.Model):
     candidate_name = models.CharField(max_length=254)
