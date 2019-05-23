@@ -10,8 +10,7 @@ from .models import Interview, Interviewer, TimeSlot
 
 class InterviewerViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows interviewers to be
-    retrieved, listed, added and edited.
+    Retrieve, list, add and edit the people holding the interview.
     """
     queryset = Interviewer.objects.all().order_by('name')
     serializer_class = InterviewerSerializer
@@ -19,8 +18,7 @@ class InterviewerViewSet(viewsets.ModelViewSet):
 
 class InterviewViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows interviews to be
-    retrieved, listed, added and edited.
+    Retrieve, list, add and edit interviews.
     """
     queryset = Interview.objects.all().order_by('start_date')
     serializer_class = InterviewSerializer
@@ -29,7 +27,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
 class TimeSlotCreateViewSet(mixins.CreateModelMixin,
                             viewsets.GenericViewSet):
     """
-    API endpoint that allows slots to be created.
+    Create time slots for interviews.
     """
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerializer
@@ -38,7 +36,7 @@ class TimeSlotCreateViewSet(mixins.CreateModelMixin,
 class TimeSlotListViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
     """
-    API endpoint that allows slots to be listed.
+    List time slots by interview
     """
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerializer
