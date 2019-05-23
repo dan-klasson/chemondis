@@ -22,8 +22,9 @@ class Interview(models.Model):
         return "{} <{}>".format(self.candidate_name, self.candidate_email)
 
     def available_slots(self, slots_qs):
+        """ returns the slots available to the candidate for the interview """
 
-        # all slots already booked for the interviewers of this interview
+        # get all slots already booked for the interviewers of this interview
         slots_to_exclude = slots_qs.filter(
             interview__interviewers__in=self.interviewers.all()
         ).values_list('interview_date', flat=True)

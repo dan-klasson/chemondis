@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Interview, Interviewer, TimeSlot
-from .validators import IsOnTheHourValidator
+from .validators import IsOnTheHourValidator, IsSameDate
 
 
 class InterviewerSerializer(serializers.ModelSerializer):
@@ -14,6 +14,10 @@ class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interview
         fields = '__all__'
+        validators = [
+            IsOnTheHourValidator(fields=['start_date', 'end_date']),
+            IsSameDate(field1='start_date', field2='end_date')
+        ]
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
@@ -21,7 +25,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         model = TimeSlot
         fields = '__all__'
         validators = [
-            IsOnTheHourValidator()
+            IsOnTheHourValidator(fields=['interview_date'])
         ]
 
     def create(self, validated_data):

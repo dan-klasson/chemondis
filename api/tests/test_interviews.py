@@ -112,6 +112,34 @@ class InterviewTestCase(TestCase):
             ['Invalid pk "123" - object does not exist.']
         )
 
+    def test_create__invalid_date(self):
+        response = self.client.post('/api/v1/interviews/', {
+            'candidate_name': 'jane doe',
+            'candidate_email': 'jane@example.com',
+            'start_date': datetime(2001, 1, 1, 10, 0),
+            'end_date': datetime(2002, 2, 2, 18, 0),
+            'interviewers': self.interviewers_ids
+        })
+        data = json.loads(response.content)
+        self.assertEqual(
+            data.get('start_date'),
+            ["'start_date' needs to be the same date as 'end_date'"]
+        )
+
+    def test_create__invalid_time(self):
+        response = self.client.post('/api/v1/interviews/', {
+            'candidate_name': 'jane doe',
+            'candidate_email': 'jane@example.com',
+            'start_date': datetime(2001, 1, 1, 10, 5),
+            'end_date': datetime(2001, 1, 1, 20, 5),
+            'interviewers': self.interviewers_ids
+        })
+        data = json.loads(response.content)
+        self.assertEqual(
+            data.get('start_date'),
+            ['Datetime must be on the hour']
+        )
+
     def test_update(self):
         obj = InterviewFactory.create()
         self.client.put(
