@@ -24,7 +24,6 @@ class InterviewTestCase(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['candidate_name'], 'Theresa Adkins')
         self.assertEqual(data['candidate_email'], 'megan32@martin.biz')
-        self.assertEqual(data['hours'], 1)
         self.assertEqual(data['start_date'], '2000-01-01T09:00:00')
         self.assertEqual(data['end_date'], '2000-01-01T17:00:00')
         self.assertEqual(data['interviewers'], self.interviewers_ids)
@@ -48,7 +47,6 @@ class InterviewTestCase(TestCase):
             {
                 'candidate_name': 'jane doe',
                 'candidate_email': 'jane@example.com',
-                'hours': 2,
                 'start_date': datetime(2002, 2, 2, 10, 0),
                 'end_date': datetime(2002, 2, 2, 18, 0),
                 'interviewers': self.interviewers_ids
@@ -57,7 +55,6 @@ class InterviewTestCase(TestCase):
         obj = Interview.objects.first()
         self.assertEqual(obj.candidate_name, 'jane doe')
         self.assertEqual(obj.candidate_email, 'jane@example.com')
-        self.assertEqual(obj.hours, 2)
         self.assertEqual(obj.start_date, datetime(2002, 2, 2, 10, 0))
         self.assertEqual(obj.end_date, datetime(2002, 2, 2, 18, 0))
         self.assertEqual(obj.interviewers.first().id, self.interviewer1.id)
@@ -122,7 +119,6 @@ class InterviewTestCase(TestCase):
             {
                 'candidate_name': 'jane doe',
                 'candidate_email': 'jane@example.com',
-                'hours': 3,
                 'start_date': datetime(2002, 2, 2, 10, 0),
                 'end_date': datetime(2002, 2, 2, 18, 0),
                 'interviewers': self.interviewers_ids
@@ -131,7 +127,6 @@ class InterviewTestCase(TestCase):
         obj = Interview.objects.first()
         self.assertEqual(obj.candidate_name, 'jane doe')
         self.assertEqual(obj.candidate_email, 'jane@example.com')
-        self.assertEqual(obj.hours, 3)
         self.assertEqual(obj.start_date, datetime(2002, 2, 2, 10, 0))
         self.assertEqual(obj.end_date, datetime(2002, 2, 2, 18, 0))
         self.assertEqual(obj.interviewers.first().id, self.interviewer1.id)

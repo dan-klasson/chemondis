@@ -19,3 +19,11 @@ class InterviewFactory(factory.DjangoModelFactory):
     candidate_email = factory.Faker('email')
     start_date = datetime(2000, 1, 1, 9, 0)
     end_date = datetime(2000, 1, 1, 17, 0)
+
+
+class TimeSlotFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.TimeSlot
+
+    interview_date = datetime(2000, 1, 1, 10, 0)
+    interview = factory.SubFactory(InterviewFactory)
