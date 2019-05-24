@@ -26,8 +26,8 @@ class ListSlotsTestCase(TestCase):
 
     def test_start_end_date(self):
         interview = InterviewFactory.create(
-            start_date=datetime(2000, 1, 1, 10),
-            end_date=datetime(2000, 1, 1, 11),
+            start_hour=10,
+            end_hour=11
         )
         response = self.client.get(self.url(interview))
         data = json.loads(response.content)

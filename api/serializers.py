@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Interview, Interviewer, TimeSlot
-from .validators import IsOnTheHourValidator, IsSameDate
+from .validators import IsValidHourValidator, IsOnTheHourValidator
 
 
 class InterviewerSerializer(serializers.ModelSerializer):
@@ -15,8 +15,7 @@ class InterviewSerializer(serializers.ModelSerializer):
         model = Interview
         fields = '__all__'
         validators = [
-            IsOnTheHourValidator(fields=['start_date', 'end_date']),
-            IsSameDate(field1='start_date', field2='end_date')
+            IsValidHourValidator('start_hour', 'end_hour')
         ]
 
 
@@ -37,7 +36,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         date = validated_data.get('interview_date')
 
         # check the datetime is valid for this interview
-        if date < interview.start_date or date > interview.end_date:
+        if date.hour < interview.start_hour or date.hour > interview.end_hour:
             raise serializers.ValidationError(
                 {"interview_date": ["Invalid datetime range."]}
             )
@@ -51,4 +50,4 @@ class TimeSlotSerializer(serializers.ModelSerializer):
                 {"interview_date": ["Slot is not longer available."]}
             )
 
-        return validated_data
+        return super().create(validated_data)

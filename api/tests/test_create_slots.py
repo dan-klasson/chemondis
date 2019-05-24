@@ -25,6 +25,7 @@ class CreateSlotsTestCase(TestCase):
             }
         )
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(TimeSlot.objects.count(), 1)
 
     def test_interviewer_already_booked(self):
         interviews = InterviewFactory.create_batch(size=2)

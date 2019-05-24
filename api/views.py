@@ -20,7 +20,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
     """
     Retrieve, list, add and edit interviews.
     """
-    queryset = Interview.objects.all().order_by('start_date')
+    queryset = Interview.objects.all()
     serializer_class = InterviewSerializer
 
 
@@ -36,7 +36,7 @@ class TimeSlotCreateViewSet(mixins.CreateModelMixin,
 class TimeSlotListViewSet(mixins.ListModelMixin,
                           viewsets.GenericViewSet):
     """
-    List time slots by interview
+    List available time slots by interview
     """
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerializer

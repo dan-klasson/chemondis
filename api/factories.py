@@ -17,8 +17,6 @@ class InterviewFactory(factory.DjangoModelFactory):
 
     candidate_name = factory.Faker('name')
     candidate_email = factory.Faker('email')
-    start_date = datetime(2000, 1, 1, 9, 0)
-    end_date = datetime(2000, 1, 1, 17, 0)
 
 
 class TimeSlotFactory(factory.DjangoModelFactory):

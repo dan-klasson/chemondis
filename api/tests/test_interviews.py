@@ -16,6 +16,22 @@ class InterviewTestCase(TestCase):
         self.interviewer2 = InterviewerFactory.create()
         self.interviewers_ids = [self.interviewer1.id, self.interviewer2.id]
 
+
+    def create(self,
+        candidate_name='jane doe',
+        candidate_email='jane@example.com',
+        start_hour=9,
+        end_hour=17,
+        interviewers=None):
+
+        return self.client.post('/api/v1/interviews/', {
+            'candidate_name': candidate_name,
+            'candidate_email': candidate_email,
+            'start_hour': start_hour,
+            'end_hour': end_hour,
+            'interviewers': interviewers or self.interviewers_ids
+        })
+
     def test_retrieve(self):
         obj = InterviewFactory.create()
         obj.interviewers.add(self.interviewer1, self.interviewer2)
@@ -24,8 +40,8 @@ class InterviewTestCase(TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['candidate_name'], 'Theresa Adkins')
         self.assertEqual(data['candidate_email'], 'megan32@martin.biz')
-        self.assertEqual(data['start_date'], '2000-01-01T09:00:00')
-        self.assertEqual(data['end_date'], '2000-01-01T17:00:00')
+        self.assertEqual(data['start_hour'], 9)
+        self.assertEqual(data['end_hour'], 17)
         self.assertEqual(data['interviewers'], self.interviewers_ids)
 
     def test_list(self):
@@ -42,34 +58,20 @@ class InterviewTestCase(TestCase):
         self.assertEqual(data[0]['interviewers'], self.interviewers_ids)
 
     def test_create(self):
-        self.client.post(
-            '/api/v1/interviews/',
-            {
-                'candidate_name': 'jane doe',
-                'candidate_email': 'jane@example.com',
-                'start_date': datetime(2002, 2, 2, 10, 0),
-                'end_date': datetime(2002, 2, 2, 18, 0),
-                'interviewers': self.interviewers_ids
-            }
-        )
+        self.create()
         obj = Interview.objects.first()
         self.assertEqual(obj.candidate_name, 'jane doe')
         self.assertEqual(obj.candidate_email, 'jane@example.com')
-        self.assertEqual(obj.start_date, datetime(2002, 2, 2, 10, 0))
-        self.assertEqual(obj.end_date, datetime(2002, 2, 2, 18, 0))
+        self.assertEqual(obj.start_hour, 9)
+        self.assertEqual(obj.end_hour, 17)
         self.assertEqual(obj.interviewers.first().id, self.interviewer1.id)
         self.assertEqual(obj.interviewers.last().id, self.interviewer2.id)
 
     def test_create__empty(self):
-        response = self.client.post(
-            '/api/v1/interviews/',
-            {
-                'candidate_name': '',
-                'candidate_email': '',
-                'start_date': '',
-                'end_date': '',
-                'interviewers': ''
-            }
+        self.interviewers_ids = ''
+        response = self.create(
+            candidate_name='',
+            candidate_email='',
         )
         data = json.loads(response.content)
         blank = ['This field may not be blank.']
@@ -86,14 +88,12 @@ class InterviewTestCase(TestCase):
         required = ['This field is required.']
         self.assertEqual(data.get('candidate_name'), required)
         self.assertEqual(data.get('candidate_email'), required)
-        self.assertEqual(data.get('start_date'), required)
-        self.assertEqual(data.get('end_date'), required)
         self.assertEqual(data.get('interviewers'), required)
 
     def test_create__invalid_email(self):
-        response = self.client.post(
-            '/api/v1/interviews/',
-            {'candidate_name': 'jane', 'candidate_email': 'invalid'}
+        response = self.create(
+            candidate_name='jane',
+            candidate_email='invalid'
         )
         data = json.loads(response.content)
         self.assertEqual(
@@ -102,42 +102,35 @@ class InterviewTestCase(TestCase):
         )
 
     def test_create__invalid_interviewers(self):
-        response = self.client.post(
-            '/api/v1/interviews/',
-            {'interviewers': 123}
-        )
+        response = self.create(interviewers=123)
         data = json.loads(response.content)
         self.assertEqual(
             data.get('interviewers'),
             ['Invalid pk "123" - object does not exist.']
         )
 
-    def test_create__invalid_date(self):
-        response = self.client.post('/api/v1/interviews/', {
-            'candidate_name': 'jane doe',
-            'candidate_email': 'jane@example.com',
-            'start_date': datetime(2001, 1, 1, 10, 0),
-            'end_date': datetime(2002, 2, 2, 18, 0),
-            'interviewers': self.interviewers_ids
-        })
+    def test_create__invalid_start_hour(self):
+        response = self.create(start_hour=-5)
         data = json.loads(response.content)
         self.assertEqual(
-            data.get('start_date'),
-            ["'start_date' needs to be the same date as 'end_date'"]
+            data.get('start_hour'),
+            ['Invalid start hour specified.']
         )
 
-    def test_create__invalid_time(self):
-        response = self.client.post('/api/v1/interviews/', {
-            'candidate_name': 'jane doe',
-            'candidate_email': 'jane@example.com',
-            'start_date': datetime(2001, 1, 1, 10, 5),
-            'end_date': datetime(2001, 1, 1, 20, 5),
-            'interviewers': self.interviewers_ids
-        })
+    def test_create__invalid_end_hour(self):
+        response = self.create(end_hour=25)
         data = json.loads(response.content)
         self.assertEqual(
-            data.get('start_date'),
-            ['Datetime must be on the hour']
+            data.get('end_hour'),
+            ['Invalid end hour specified.']
+        )
+
+    def test_create__invalid_start_and_end_hour(self):
+        response = self.create(start_hour=20, end_hour=20)
+        data = json.loads(response.content)
+        self.assertEqual(
+            data.get('start_hour'),
+            ["Start can't be greater or equal to end hour."]
         )
 
     def test_update(self):
@@ -147,16 +140,16 @@ class InterviewTestCase(TestCase):
             {
                 'candidate_name': 'jane doe',
                 'candidate_email': 'jane@example.com',
-                'start_date': datetime(2002, 2, 2, 10, 0),
-                'end_date': datetime(2002, 2, 2, 18, 0),
+                'start_hour': 10,
+                'end_hour': 18,
                 'interviewers': self.interviewers_ids
             }
         )
         obj = Interview.objects.first()
         self.assertEqual(obj.candidate_name, 'jane doe')
         self.assertEqual(obj.candidate_email, 'jane@example.com')
-        self.assertEqual(obj.start_date, datetime(2002, 2, 2, 10, 0))
-        self.assertEqual(obj.end_date, datetime(2002, 2, 2, 18, 0))
+        self.assertEqual(obj.start_hour, 10)
+        self.assertEqual(obj.end_hour, 18)
         self.assertEqual(obj.interviewers.first().id, self.interviewer1.id)
         self.assertEqual(obj.interviewers.last().id, self.interviewer2.id)
 

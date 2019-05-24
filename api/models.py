@@ -13,8 +13,8 @@ class Interviewer(models.Model):
 class Interview(models.Model):
     candidate_name = models.CharField(max_length=254)
     candidate_email = models.EmailField()
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_hour = models.IntegerField(default=9)
+    end_hour = models.IntegerField(default=17)
     slot_days = models.IntegerField(default=20)
     interviewers = models.ManyToManyField(Interviewer)
 
@@ -24,7 +24,7 @@ class Interview(models.Model):
     def available_slots(self, slots_qs):
         """ returns the slots available to the candidate for the interview """
 
-        # get all slots already booked for the interviewers of this interview
+        # get all slots already booked
         slots_to_exclude = slots_qs.filter(
             interview__interviewers__in=self.interviewers.all()
         ).values_list('interview_date', flat=True)
@@ -32,7 +32,7 @@ class Interview(models.Model):
         available = []
         for day in range(0, self.slot_days):
             date = datetime.now() + timedelta(days=day + 1)
-            for hour in range(self.start_date.hour, self.end_date.hour):
+            for hour in range(self.start_hour, self.end_hour):
                 dt = datetime(date.year, date.month, date.day, hour)
                 if dt not in slots_to_exclude:
                     available.append(dt)
